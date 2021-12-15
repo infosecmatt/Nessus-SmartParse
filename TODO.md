@@ -16,8 +16,8 @@
 - most vulnerable hosts
 	- using weighted CVSS scores
 		- 10000 lows = 1 critical
-		- 500  mediums = 1 critical
-		- 20 highs = 1 critical
+		- 100  mediums = 1 critical
+		- 10 highs = 1 critical
 		- 1 critical = 1 critical
 		- subject to change
 - most severe vulnerabilities
