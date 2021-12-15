@@ -1,0 +1,29 @@
+# TODO
+
+- (DONE) Count of in-scope IP addresses
+- (DONE) Count of active hosts (unique hosts that returned a result)
+- (DONE) Count of hosts with at least one vulnerability (i.e. ones that returned a Low or higher)
+- Total services (e.g., SMB, HTTP)
+	- broken down by service (count each SMB, HTTP, etc.)
+- Total vulnerabilities
+	- broken down by criticality
+	- broken down by service/port
+	- broken down by OS
+	- broken down by network segment
+- distinct vulnerabilities
+	- broken down by criticality
+- most vulnerable hosts
+	- using weighted CVSS scores
+		- 10000 lows = 1 critical
+		- 500  mediums = 1 critical
+		- 20 highs = 1 critical
+		- 1 critical = 1 critical
+		- subject to change
+- most severe vulnerabilities
+	- combination of frequency found + weighted CVSS score
+- average vulnerability age by criticality
+- percent vulnerabilities younger than 30 days by criticality
+	- for critical, break down further using 0-15, 16-30, 31-90, 90+
+- celebrity CVEs
+- top 25 vulnerabilities by criticality
+
