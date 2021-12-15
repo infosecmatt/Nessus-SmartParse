@@ -4,9 +4,10 @@
 - (DONE) Count of active hosts (unique hosts that returned a result)
 - (DONE) Count of hosts with at least one vulnerability (i.e. ones that returned a Low or higher)
 - Total services (e.g., SMB, HTTP)
-	- broken down by service (count each SMB, HTTP, etc.)
-- Total vulnerabilities
-	- broken down by criticality
+	- (DONE) broken down by service (count each SMB, HTTP, etc.)
+		- Identify services by mapping ports to probably protocols
+- (DONE) Total vulnerabilities
+	- (DONE) broken down by criticality
 	- broken down by service/port
 	- broken down by OS
 	- broken down by network segment

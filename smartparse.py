@@ -20,7 +20,6 @@ print("Hosts with at least one vulnerability:", vulnerable['Host'].nunique())
 # number of services identified on the network
 
 UniqueIPPort = df.drop_duplicates(subset=['Host','Protocol','Port'], keep='last')
-print(UniqueIPPort)
 print("Total number of services identified during scanning:",len(UniqueIPPort.index))
 
 # services identified broken down by protocol/port
@@ -28,7 +27,6 @@ print("Total number of services identified during scanning:",len(UniqueIPPort.in
 # tcp
 IsTCP = UniqueIPPort['Protocol'] == 'tcp'
 TCPServicePorts = UniqueIPPort[IsTCP]
-print(TCPServicePorts)
 
 TCPServicePortCount = [{'Port': k, 'Count': v}for k, v in dict(TCPServicePorts["Port"].value_counts()).items()]
 for x in TCPServicePortCount:
@@ -47,6 +45,14 @@ for x in UDPServicePortCount:
         print(x["Count"],"device identified as having UDP port",x["Port"], "open.")
     else:
         print(x["Count"],"devices identified as having UDP port",x["Port"], "open.")
+
+# icmp
+IsICMP = UniqueIPPort['Protocol'] == 'icmp'
+ICMPHosts = UniqueIPPort[IsICMP]
+
+ICMPHostCount = [{'Port': k, 'Count': v}for k, v in dict(ICMPHosts["Port"].value_counts()).items()]
+for x in ICMPHostCount:
+    print(x["Count"], "devices were found to respond to ICMP requests.")
 
 
 # Number of vulnerabilities based on criticality
