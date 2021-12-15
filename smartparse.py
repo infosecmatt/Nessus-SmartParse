@@ -18,11 +18,35 @@ vulnerable = df.loc[df['Risk'] != 'None']
 print("Hosts with at least one vulnerability:", vulnerable['Host'].nunique())
 
 # number of services identified on the network
-UniqueIPPort = df.drop_duplicates(subset=['Host', 'Protocol', 'Port'], keep='last')
 
-UniqueIPPort = df.groupby(['Host', 'Protocol', 'Port']).first()
+UniqueIPPort = df.drop_duplicates(subset=['Host','Protocol','Port'], keep='last')
+print(UniqueIPPort)
 print("Total number of services identified during scanning:",len(UniqueIPPort.index))
 
+# services identified broken down by protocol/port
+
+# tcp
+IsTCP = UniqueIPPort['Protocol'] == 'tcp'
+TCPServicePorts = UniqueIPPort[IsTCP]
+print(TCPServicePorts)
+
+TCPServicePortCount = [{'Port': k, 'Count': v}for k, v in dict(TCPServicePorts["Port"].value_counts()).items()]
+for x in TCPServicePortCount:
+    if x["Count"] == 1:
+        print(x["Count"],"device identified as having TCP port",x["Port"], "open.")
+    else:
+        print(x["Count"],"devices identified as having TCP port",x["Port"], "open.")
+
+# udp
+IsUDP = UniqueIPPort['Protocol'] == 'udp'
+UDPServicePorts = UniqueIPPort[IsUDP]
+
+UDPServicePortCount = [{'Port': k, 'Count': v}for k, v in dict(UDPServicePorts["Port"].value_counts()).items()]
+for x in UDPServicePortCount:
+    if x["Count"] == 1:
+        print(x["Count"],"device identified as having UDP port",x["Port"], "open.")
+    else:
+        print(x["Count"],"devices identified as having UDP port",x["Port"], "open.")
 
 
 # Number of vulnerabilities based on criticality
