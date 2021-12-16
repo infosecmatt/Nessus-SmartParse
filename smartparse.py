@@ -61,3 +61,43 @@ print("Number of vulnerabilities identified during scanning based on criticality
 VulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(df["Risk"].value_counts()).items()]
 for x in VulnSummary:
     print(x["Risk"],":",x["Count"],"vulnerabilities found.")
+
+# Vulnerabilities broken down by service
+print()
+print("Vulnerability Summary for each identified open port:")
+print()
+print("Vulnerabilities on TCP ports:")
+print()
+
+# TODO: improve this whole thing. by creating a list of lists I could turn this entire section into one big nested for loop.
+
+# tcp
+for x in TCPServicePortCount:
+    print("Vulnerability Summary for TCP port",x["Port"],":")
+    IsPort = df['Port'] == x["Port"]
+    PortVulnResults = df[IsPort]
+    PortVulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
+    for y in PortVulnSummary:
+        print(y["Risk"],":",y["Count"],"vulnerabilities found.")
+    print()
+
+# udp
+print()
+print("Vulnerabilities on UDP ports:")
+print()
+for x in UDPServicePortCount:
+    print("Vulnerability Summary for UDP port",x["Port"],":")
+    IsPort = df['Port'] == x["Port"]
+    PortVulnResults = df[IsPort]
+    PortVulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
+    for y in PortVulnSummary:
+        print(y["Risk"],":",y["Count"],"vulnerabilities found.")
+    print()
+
+#icmp
+print()
+print("Vulnerabilities related to ICMP services:")
+print()
+ICMPVulnSummary = [{"Risk":k,"Count":v} for k,v in dict(ICMPHosts["Risk"].value_counts()).items()]
+for x in ICMPVulnSummary:
+    print(x["Risk"],":",x["Count"],"vulnerabilities found.")

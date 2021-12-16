@@ -8,7 +8,7 @@
 		- Identify services by mapping ports to probably protocols
 - (DONE) Total vulnerabilities
 	- (DONE) broken down by criticality
-	- broken down by service/port
+	- (DONE) broken down by service/port
 	- broken down by OS
 	- broken down by network segment
 - distinct vulnerabilities
