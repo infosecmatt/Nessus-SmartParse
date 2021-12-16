@@ -115,3 +115,34 @@ for x in RiskRatings:
     AggregatedVulns = pd.DataFrame(AggregatedVulnCount)
     print(RiskGroupVulns.merge(AggregatedVulns, on='Plugin ID', how='left').drop_duplicates(subset=['Plugin ID']))
     print()
+
+# get count vulnerabilities by Risk rating for each scanned host
+print()
+print("Getting vulnerability summary and a weighted risk rating for each host:")
+Hosts = df["Host"].unique()
+HostVulnSummary = []
+for x in Hosts:
+    MatchesHost = df["Host"] == x
+    HostVulns = df[MatchesHost]
+    AggregatedVulnCount = [{'Risk':k,'Count':v} for k,v in dict(HostVulns['Risk'].value_counts()).items()]
+    AggregatedVulns = pd.DataFrame(AggregatedVulnCount)
+    d = {"Host":x}
+    RiskScore = 0
+    for y in AggregatedVulnCount:
+        #updating risk score
+        if y["Risk"] == "Critical":
+            RiskScore += y["Count"]
+        elif y["Risk"] == "High":
+            RiskScore += y["Count"] / 10
+        elif y["Risk"] == "Medium":
+            RiskScore += y["Count"] / 100
+        elif y["Risk"] == "Low":
+            RiskScore += y["Count"] / 10000
+
+        d[y["Risk"]] = y["Count"]
+        d["RiskScore"] = RiskScore
+
+    HostVulnSummary.append(d)
+dfHostVulnSummary = pd.DataFrame(HostVulnSummary)
+print(dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False))
+

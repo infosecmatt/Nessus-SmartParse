@@ -11,10 +11,10 @@
 	- (DONE) broken down by service/port
 	- broken down by OS
 	- broken down by network segment
-- distinct vulnerabilities
+- (DONE) distinct vulnerabilities
 	- (DONE) broken down by criticality
-- most vulnerable hosts
-	- using weighted CVSS scores
+- (DONE) most vulnerable hosts
+	- (DONE) using weighted CVSS scores
 		- 10000 lows = 1 critical
 		- 100  mediums = 1 critical
 		- 10 highs = 1 critical
