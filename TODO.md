@@ -12,7 +12,7 @@
 	- broken down by OS
 	- broken down by network segment
 - distinct vulnerabilities
-	- broken down by criticality
+	- (DONE) broken down by criticality
 - most vulnerable hosts
 	- using weighted CVSS scores
 		- 10000 lows = 1 critical
@@ -27,4 +27,10 @@
 	- for critical, break down further using 0-15, 16-30, 31-90, 90+
 - celebrity CVEs
 - top 25 vulnerabilities by criticality
+- make the initial codebase less ugly and more efficient
+- make sure everything gets outputted as csv
 
+
+Long term ideas:
+- incorporate visualization / pretty output of everything
+- develop mechanism for trend monitoring

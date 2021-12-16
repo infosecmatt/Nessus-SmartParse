@@ -107,11 +107,7 @@ for x in ICMPVulnSummary:
 # get count of unique vulnerabilities for each criticality level
 RiskRatings = df["Risk"].unique()
 for x in RiskRatings:
-    print("Aggregated vulnerability counts based on NessusID for the risk rating",x,":")
-    MatchesRisk = df['Risk'] == x
+    MatchesRisk = df['Risk'] == RiskRatings[x]
     RiskGroupVulns = df[MatchesRisk]
-    AggregatedVulnCount = [{'Plugin ID':k,'Count':v} for k,v in dict(RiskGroupVulns["Plugin ID"].value_counts()).items()]
-    print(len(AggregatedVulnCount),"unique vulnerabilities with the risk rating",x,"were identified.")
-    AggregatedVulns = pd.DataFrame(AggregatedVulnCount)
-    print(RiskGroupVulns.merge(AggregatedVulns, on='Plugin ID', how='left').drop_duplicates(subset=['Plugin ID']))
-    print()
+    AggregatedVulns = RiskGroupVulns.groupby["Plugin ID"]
+    print(AggregatedVulns)
