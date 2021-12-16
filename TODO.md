@@ -20,6 +20,7 @@
 		- 10 highs = 1 critical
 		- 1 critical = 1 critical
 		- subject to change
+		- Actually, I do want to change it. Need to move to CVSS in the future as the severity range is too wide to just use's Nessus' Risk attribute, especially in the High Risk range
 - most severe vulnerabilities
 	- combination of frequency found + weighted CVSS score
 - average vulnerability age by criticality

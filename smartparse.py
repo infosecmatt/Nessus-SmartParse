@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import ipaddress as ip
 
 df = pd.read_csv("../scan.csv")
@@ -104,18 +105,33 @@ for x in ICMPVulnSummary:
 
 
 
-# get count of unique vulnerabilities for each criticality level
+# get count of unique vulnerabilities for each criticality level as well as environment risk rating for each individual Nessus ID
 RiskRatings = df["Risk"].unique()
 for x in RiskRatings:
     print("Aggregated vulnerability counts based on NessusID for the risk rating",x,":")
     MatchesRisk = df['Risk'] == x
     RiskGroupVulns = df[MatchesRisk]
     AggregatedVulnCount = [{'Plugin ID':k,'Count':v} for k,v in dict(RiskGroupVulns["Plugin ID"].value_counts()).items()]
+    xyz = []
+    d = {}
     print(len(AggregatedVulnCount),"unique vulnerabilities with the risk rating",x,"were identified.")
     AggregatedVulns = pd.DataFrame(AggregatedVulnCount)
-    print(RiskGroupVulns.merge(AggregatedVulns, on='Plugin ID', how='left').drop_duplicates(subset=['Plugin ID']))
+    IDVulnSummary = RiskGroupVulns.merge(AggregatedVulns, on='Plugin ID', how='left').drop_duplicates(subset=['Plugin ID'])
+    IDVulnSummary["RiskScore"] = np.nan
+    for index,row in IDVulnSummary.iterrows():
+        if row["Risk"] == "Critical":
+            IDVulnSummary["RiskScore"] = IDVulnSummary["Count"]
+        elif row["Risk"] == "High":
+            IDVulnSummary["RiskScore"] = IDVulnSummary["Count"] / 10
+        elif row["Risk"] == "Medium":
+            IDVulnSummary["RiskScore"] = IDVulnSummary["Count"] / 100
+        elif row["Risk"] == "Low":
+            IDVulnSummary["RiskScore"] = IDVulnSummary["Count"] / 10000
+        else:
+            IDVulnSummary["RiskScore"] = 0
+    print(IDVulnSummary.sort_values(by='RiskScore',ascending=False, ignore_index=True))
     print()
-
+    
 # get count vulnerabilities by Risk rating for each scanned host
 print()
 print("Getting vulnerability summary and a weighted risk rating for each host:")
@@ -144,5 +160,5 @@ for x in Hosts:
 
     HostVulnSummary.append(d)
 dfHostVulnSummary = pd.DataFrame(HostVulnSummary)
-print(dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False))
+print(dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False, ignore_index=True))
 
