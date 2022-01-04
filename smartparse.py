@@ -87,7 +87,7 @@ UniqueIPPort = df.drop_duplicates(subset=['Host','Protocol','Port'], keep='last'
 TotalServices = {'Observation':"Total number of services identified during scanning",'Count':len(UniqueIPPort.index)}
 HighLevel.append(TotalServices)
 dfHighLevel = pd.DataFrame(HighLevel, columns=['Observation','Count'])
-dfHighLevel.to_csv(path + '/' + "HighLevelSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+dfHighLevel.to_csv(path + '/' + "HighLevelSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True, encoding='utf-8', index=False)
 # services identified broken down by protocol/port
 
 # tcp hosts
@@ -108,7 +108,7 @@ ICMPHostCount = [{'Port': k, 'Count': v}for k, v in dict(ICMPHosts["Port"].value
 # Number of vulnerabilities based on criticality
 VulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(df["Risk"].value_counts()).items()]
 dfVulnSummary = pd.DataFrame(VulnSummary)
-dfVulnSummary.to_csv(path + '/' + "VulnCriticalitySummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+dfVulnSummary.to_csv(path + '/' + "VulnCriticalitySummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True, encoding='utf-8', index=False)
 
 # Vulnerabilities broken down by service / each open port
 
@@ -172,7 +172,7 @@ ICMPVulnList["RiskScore"] = ICMPRiskScore
 PortVulnList.append(ICMPVulnList)
 
 dfPortVulnList = pd.DataFrame(PortVulnList)
-dfPortVulnList.to_csv(path + '/' + "PortVulnList.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+dfPortVulnList.to_csv(path + '/' + "PortVulnList.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True, encoding='utf-8', index=False)
 # get count of unique vulnerabilities for each criticality level as well as environment risk rating for each individual Nessus ID
 RiskRatings = df["Risk"].unique()
 UniqueVulnsPerRisk = []
@@ -198,9 +198,9 @@ for x in RiskRatings:
         else:
             IDVulnSummary["RiskScore"] = 0
     IDVulnSummary = IDVulnSummary.sort_values(by='RiskScore',ascending=False, ignore_index=True)
-    IDVulnSummary.to_csv(path + '/' + x +"-NessusIDVulnSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+    IDVulnSummary.to_csv(path + '/' + x +"-NessusIDVulnSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True, encoding='utf-8', index=False)
 dfUniqueVulnsPerRisk = pd.DataFrame(UniqueVulnsPerRisk)
-dfUniqueVulnsPerRisk.to_csv(path+'/'+'UniqueVulnsPerRisk.csv',quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False,encoding='utf-8',index=False)
+dfUniqueVulnsPerRisk.to_csv(path+'/'+'UniqueVulnsPerRisk.csv',quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True,encoding='utf-8',index=False)
 # get count vulnerabilities by Risk rating for each scanned host
 Hosts = df["Host"].unique()
 HostVulnSummary = []
@@ -228,5 +228,5 @@ for x in Hosts:
     HostVulnSummary.append(d)
 dfHostVulnSummary = pd.DataFrame(HostVulnSummary)
 dfHostVulnSummary = dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False, ignore_index=True)
-dfHostVulnSummary.to_csv(path + '/' + "HostBasedSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+dfHostVulnSummary.to_csv(path + '/' + "HostBasedSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=True, encoding='utf-8', index=False)
 
