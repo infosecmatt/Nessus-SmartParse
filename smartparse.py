@@ -71,16 +71,34 @@ print("Vulnerabilities on TCP ports:")
 print()
 
 # TODO: improve this whole thing. by creating a list of lists I could turn this entire section into one big nested for loop.
+dfColumns = ["Protocol","Port","Count","Risk Rating","Critical","High","Medium","Low","None"]
+PortVulnList = []
 
 # tcp
+
 for x in TCPServicePortCount:
-    print("Vulnerability Summary for TCP port",x["Port"],":")
     IsPort = df['Port'] == x["Port"]
     PortVulnResults = df[IsPort]
-    PortVulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
-    for y in PortVulnSummary:
-        print(y["Risk"],":",y["Count"],"vulnerabilities found.")
+    PortVulnCount = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
+    PortVulns = pd.DataFrame(PortVulnCount)
+    d = {"Port":x["Port"], "PortCount":x["Count"], "Protocol":"tcp"}
+    RiskScore = 0
+    #print(PortVulns)
+    for y in PortVulnCount:
+        if y["Risk"] == "Critical":
+            RiskScore += y["Count"]
+        elif y["Risk"] == "High":
+            RiskScore += y["Count"] / 10
+        elif y["Risk"] == "Medium":
+            RiskScore += y["Count"] / 100
+        elif y["Risk"] == "Low":
+            RiskScore += y["Count"] / 10000
+        d[y["Risk"]] = y["Count"]
+    d["RiskScore"] = RiskScore 
+    PortVulnList.append(d)
     print()
+dfPortVulnList = pd.DataFrame(PortVulnList)
+print(dfPortVulnList)
 
 # udp
 print()
