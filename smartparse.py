@@ -3,6 +3,7 @@ import numpy as np
 import ipaddress as ip
 import argparse as ap
 import os
+import csv
 
 #argparse
 parser = ap.ArgumentParser(description='Take a supplied Nessus scan .csv output, perform useful permutations to the data to reveal insights into vulnerability management, and use those insights to provide meaningful reporting metrics.')
@@ -10,8 +11,29 @@ parser.add_argument('-f','--input-file', required=True, help='The Nessus .csv fi
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-r','--ip-range', required=False, help='In-scope IP range used for scanning. If multiple subnets are used, use -rf instead.',dest='iprange')
 group.add_argument('-rf','--range-file', required=False, help='File containing list of in-scope IPs, separated by newline characters',dest='rangefile')
+parser.add_argument('-o','--out-path',default=__file__, help='Directory where permutated data will be output.',dest='outpath')
 args = parser.parse_args()
 
+# making directory for reporting / output
+path = ""
+if os.path.isdir(args.outpath):
+    path = os.path.join(args.outpath,"output")
+    try:
+        os.makedirs(path)
+        os.chmod(path,0o755)
+    except FileExistsError:
+        exit("Directory "+path+" already exists.")
+    except:
+        exit("Unable to create folder for output. Do you have write permissions to "+args.outpath+"?")
+else:
+    path = os.path.join(os.path.dirname(args.outpath),"output")
+    try:
+        os.makedirs(path)
+        os.chmod(path,0o755)
+    except FileExistsError:
+        exit("Directory "+path+" already exists.")
+    except:
+        exit("Unable to create folder for output. Do you have write permissions to "+os.path.dirname(args.outpath)+"?")
 # checking if supplied file exists
 if os.path.isfile(args.path):
 	try:
@@ -22,7 +44,6 @@ else:
 	exit("Invalid file or path: " + args.path)
 
 #high level analysis
-print("High level observations")
 HighLevel = []
 # checking if supplied IP range is valid and counting in-scope addresses if valid
 try:
@@ -53,7 +74,6 @@ with open(args.rangefile, 'r') as scope:
     HighLevel.append(InScopeAddresses)
 
 # number of unique hosts identified during scanning
-print()
 AvailableHosts = {'Observation':"Hosts identified during scanning",'Count':df['Host'].nunique()}
 HighLevel.append(AvailableHosts)
 
@@ -67,7 +87,7 @@ UniqueIPPort = df.drop_duplicates(subset=['Host','Protocol','Port'], keep='last'
 TotalServices = {'Observation':"Total number of services identified during scanning",'Count':len(UniqueIPPort.index)}
 HighLevel.append(TotalServices)
 dfHighLevel = pd.DataFrame(HighLevel, columns=['Observation','Count'])
-print(dfHighLevel)
+dfHighLevel.to_csv(path + '/' + "HighLevelSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
 # services identified broken down by protocol/port
 
 # tcp hosts
@@ -86,16 +106,11 @@ ICMPHosts = UniqueIPPort[IsICMP]
 ICMPHostCount = [{'Port': k, 'Count': v}for k, v in dict(ICMPHosts["Port"].value_counts()).items()]
 
 # Number of vulnerabilities based on criticality
-print()
-print("Number of vulnerabilities identified during scanning based on criticality:")
 VulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(df["Risk"].value_counts()).items()]
 dfVulnSummary = pd.DataFrame(VulnSummary)
-print(dfVulnSummary)
+dfVulnSummary.to_csv(path + '/' + "VulnCriticalitySummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
 
-# Vulnerabilities broken down by service
-print()
-print("Vulnerability Summary for each identified open port:")
-print()
+# Vulnerabilities broken down by service / each open port
 
 PortVulnList = []
 
@@ -157,17 +172,17 @@ ICMPVulnList["RiskScore"] = ICMPRiskScore
 PortVulnList.append(ICMPVulnList)
 
 dfPortVulnList = pd.DataFrame(PortVulnList)
-print(dfPortVulnList)
+dfPortVulnList.to_csv(path + '/' + "PortVulnList.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
 # get count of unique vulnerabilities for each criticality level as well as environment risk rating for each individual Nessus ID
 RiskRatings = df["Risk"].unique()
+UniqueVulnsPerRisk = []
 for x in RiskRatings:
-    print("Aggregated vulnerability counts based on NessusID for the risk rating",x,":")
+    # print("Aggregated vulnerability counts based on NessusID for the risk rating",x,":")
     MatchesRisk = df['Risk'] == x
     RiskGroupVulns = df[MatchesRisk]
     AggregatedVulnCount = [{'Plugin ID':k,'Count':v} for k,v in dict(RiskGroupVulns["Plugin ID"].value_counts()).items()]
-    xyz = []
-    d = {}
-    print(len(AggregatedVulnCount),"unique vulnerabilities with the risk rating",x,"were identified.")
+    d = {"Risk":x,"Unique Count": len(AggregatedVulnCount)}
+    UniqueVulnsPerRisk.append(d)
     AggregatedVulns = pd.DataFrame(AggregatedVulnCount)
     IDVulnSummary = RiskGroupVulns.merge(AggregatedVulns, on='Plugin ID', how='left').drop_duplicates(subset=['Plugin ID'])
     IDVulnSummary["RiskScore"] = np.nan
@@ -182,12 +197,11 @@ for x in RiskRatings:
             IDVulnSummary["RiskScore"] = IDVulnSummary["Count"] / 10000
         else:
             IDVulnSummary["RiskScore"] = 0
-    print(IDVulnSummary.sort_values(by='RiskScore',ascending=False, ignore_index=True))
-    print()
-    
+    IDVulnSummary = IDVulnSummary.sort_values(by='RiskScore',ascending=False, ignore_index=True)
+    IDVulnSummary.to_csv(path + '/' + x +"-NessusIDVulnSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
+dfUniqueVulnsPerRisk = pd.DataFrame(UniqueVulnsPerRisk)
+dfUniqueVulnsPerRisk.to_csv(path+'/'+'UniqueVulnsPerRisk.csv',quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False,encoding='utf-8',index=False)
 # get count vulnerabilities by Risk rating for each scanned host
-print()
-print("Getting vulnerability summary and a weighted risk rating for each host:")
 Hosts = df["Host"].unique()
 HostVulnSummary = []
 for x in Hosts:
@@ -213,5 +227,6 @@ for x in Hosts:
 
     HostVulnSummary.append(d)
 dfHostVulnSummary = pd.DataFrame(HostVulnSummary)
-print(dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False, ignore_index=True))
+dfHostVulnSummary = dfHostVulnSummary.sort_values(by=['RiskScore', 'Critical', 'High', 'Medium', 'Low', 'None'], ascending=False, ignore_index=True)
+dfHostVulnSummary.to_csv(path + '/' + "HostBasedSummary.csv",quoting=csv.QUOTE_NONNUMERIC,escapechar="\\",doublequote=False, encoding='utf-8', index=False)
 

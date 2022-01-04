@@ -29,7 +29,7 @@
 - celebrity CVEs
 - top 25 vulnerabilities by criticality
 - make the initial codebase less ugly and more efficient
-- (DONE) make sure everything gets outputted as csv
+- make sure everything gets outputted as csv
 
 
 Long term ideas:
