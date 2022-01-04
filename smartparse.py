@@ -7,6 +7,9 @@ import os
 #argparse
 parser = ap.ArgumentParser(description='Take a supplied Nessus scan .csv output, perform useful permutations to the data to reveal insights into vulnerability management, and use those insights to provide meaningful reporting metrics.')
 parser.add_argument('-f','--input-file', required=True, help='The Nessus .csv file to be analyzed.', dest='path')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-r','--ip-range', required=False, help='In-scope IP range used for scanning. If multiple subnets are used, use -rf instead.',dest='iprange')
+group.add_argument('-rf','--range-file', required=False, help='File containing list of in-scope IPs, separated by newline characters',dest='rangefile')
 args = parser.parse_args()
 
 # checking if supplied file exists
@@ -18,15 +21,37 @@ if os.path.isfile(args.path):
 else:
 	exit("Invalid file or path: " + args.path)
 
-# high level summary
-
-print("High level observations:")
+#high level analysis
+print("High level observations")
 HighLevel = []
+# checking if supplied IP range is valid and counting in-scope addresses if valid
+try:
+	IPRange = ip.ip_network(args.iprange)
+	#number of in scope IP addresses
+	InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':int(IPRange[-1]) - int(IPRange[0])}
+	HighLevel.append(InScopeAddresses)
+except:
+	if args.iprange is not None:
+		exit("Invalid IP range. Please ensure that the provided range uses slash notation.")
 
-# number of in scope IP addresses
-IPRange = ip.ip_network('10.5.5.0/24')
-InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':int(IPRange[-1]) - int(IPRange[0])}
-HighLevel.append(InScopeAddresses)
+# checking if supplied IP range file is valid
+with open(args.rangefile, 'r') as scope:
+    InScopeAddressCount = 0
+    for line in scope:
+        value = line.strip()
+        try:
+            ip.ip_address(value)
+            InScopeAddressCount += 1
+        except:
+            try:
+                subnet = ip.ip_network(value)
+                IpsInRange = int(subnet[-1]) - int(subnet[0])
+                InScopeAddressCount += IpsInRange
+            except:
+                exit("Error encountered with IP range file. " + value + " is not a valid IP address or range.")
+    InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':InScopeAddressCount}
+    HighLevel.append(InScopeAddresses)
+
 # number of unique hosts identified during scanning
 print()
 AvailableHosts = {'Observation':"Hosts identified during scanning",'Count':df['Host'].nunique()}
