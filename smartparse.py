@@ -1,10 +1,25 @@
 import pandas as pd
 import numpy as np
 import ipaddress as ip
+import argparse as ap
+import os
 
-df = pd.read_csv("../scan.csv")
+#argparse
+parser = ap.ArgumentParser(description='Take a supplied Nessus scan .csv output, perform useful permutations to the data to reveal insights into vulnerability management, and use those insights to provide meaningful reporting metrics.')
+parser.add_argument('-f','--input-file', required=True, help='The Nessus .csv file to be analyzed.', dest='path')
+args = parser.parse_args()
+
+# checking if supplied file exists
+if os.path.isfile(args.path):
+	try:
+		df = pd.read_csv(args.path)
+	except:
+		exit("ERROR: Supplied file " + args.path + " is not a csv. Exiting...")
+else:
+	exit("Invalid file or path: " + args.path)
 
 # high level summary
+
 print("High level observations:")
 HighLevel = []
 
