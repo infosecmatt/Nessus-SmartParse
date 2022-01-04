@@ -25,65 +25,42 @@ print("Total number of services identified during scanning:",len(UniqueIPPort.in
 
 # services identified broken down by protocol/port
 
-# tcp
+# tcp hosts
 IsTCP = UniqueIPPort['Protocol'] == 'tcp'
 TCPServicePorts = UniqueIPPort[IsTCP]
-
 TCPServicePortCount = [{'Port': k, 'Count': v}for k, v in dict(TCPServicePorts["Port"].value_counts()).items()]
-for x in TCPServicePortCount:
-    if x["Count"] == 1:
-        print(x["Count"],"device identified as having TCP port",x["Port"], "open.")
-    else:
-        print(x["Count"],"devices identified as having TCP port",x["Port"], "open.")
 
-# udp
+# udp hosts
 IsUDP = UniqueIPPort['Protocol'] == 'udp'
 UDPServicePorts = UniqueIPPort[IsUDP]
-
 UDPServicePortCount = [{'Port': k, 'Count': v}for k, v in dict(UDPServicePorts["Port"].value_counts()).items()]
-for x in UDPServicePortCount:
-    if x["Count"] == 1:
-        print(x["Count"],"device identified as having UDP port",x["Port"], "open.")
-    else:
-        print(x["Count"],"devices identified as having UDP port",x["Port"], "open.")
 
-# icmp
+# icmp hosts
 IsICMP = UniqueIPPort['Protocol'] == 'icmp'
 ICMPHosts = UniqueIPPort[IsICMP]
-
 ICMPHostCount = [{'Port': k, 'Count': v}for k, v in dict(ICMPHosts["Port"].value_counts()).items()]
-for x in ICMPHostCount:
-    print(x["Count"], "devices were found to respond to ICMP requests.")
-
 
 # Number of vulnerabilities based on criticality
 print()
 print("Number of vulnerabilities identified during scanning based on criticality:")
 VulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(df["Risk"].value_counts()).items()]
-for x in VulnSummary:
-    print(x["Risk"],":",x["Count"],"vulnerabilities found.")
+dfVulnSummary = pd.DataFrame(VulnSummary)
+print(dfVulnSummary)
 
 # Vulnerabilities broken down by service
 print()
 print("Vulnerability Summary for each identified open port:")
 print()
-print("Vulnerabilities on TCP ports:")
-print()
 
-# TODO: improve this whole thing. by creating a list of lists I could turn this entire section into one big nested for loop.
-dfColumns = ["Protocol","Port","Count","Risk Rating","Critical","High","Medium","Low","None"]
 PortVulnList = []
 
 # tcp
-
 for x in TCPServicePortCount:
     IsPort = df['Port'] == x["Port"]
     PortVulnResults = df[IsPort]
     PortVulnCount = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
-    PortVulns = pd.DataFrame(PortVulnCount)
     d = {"Port":x["Port"], "PortCount":x["Count"], "Protocol":"tcp"}
     RiskScore = 0
-    #print(PortVulns)
     for y in PortVulnCount:
         if y["Risk"] == "Critical":
             RiskScore += y["Count"]
@@ -96,33 +73,46 @@ for x in TCPServicePortCount:
         d[y["Risk"]] = y["Count"]
     d["RiskScore"] = RiskScore 
     PortVulnList.append(d)
-    print()
-dfPortVulnList = pd.DataFrame(PortVulnList)
-print(dfPortVulnList)
 
 # udp
-print()
-print("Vulnerabilities on UDP ports:")
-print()
 for x in UDPServicePortCount:
-    print("Vulnerability Summary for UDP port",x["Port"],":")
     IsPort = df['Port'] == x["Port"]
     PortVulnResults = df[IsPort]
-    PortVulnSummary = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
-    for y in PortVulnSummary:
-        print(y["Risk"],":",y["Count"],"vulnerabilities found.")
-    print()
+    PortVulnCount = [{'Risk': k, 'Count': v} for k, v in dict(PortVulnResults["Risk"].value_counts()).items()]
+    d = {"Port":x["Port"], "PortCount":x["Count"], "Protocol":"udp"}
+    RiskScore = 0
+    for y in PortVulnCount:
+        if y["Risk"] == "Critical":
+            RiskScore += y["Count"]
+        elif y["Risk"] == "High":
+            RiskScore += y["Count"] / 10
+        elif y["Risk"] == "Medium":
+            RiskScore += y["Count"] / 100
+        elif y["Risk"] == "Low":
+            RiskScore += y["Count"] / 10000
+        d[y["Risk"]] = y["Count"]
+    d["RiskScore"] = RiskScore
+    PortVulnList.append(d)
 
 #icmp
-print()
-print("Vulnerabilities related to ICMP services:")
-print()
 ICMPVulnSummary = [{"Risk":k,"Count":v} for k,v in dict(ICMPHosts["Risk"].value_counts()).items()]
+ICMPVulnList = {"PortCount":ICMPHostCount[0]['Count'],"Protocol":"icmp"}
+ICMPRiskScore = 0
 for x in ICMPVulnSummary:
-    print(x["Risk"],":",x["Count"],"vulnerabilities found.")
+    if x["Risk"] == "Critical":
+        ICMPRiskScore += x["Count"]
+    elif x["Risk"] == "High":
+        ICMPRiskScore += x["Count"] / 10
+    elif x["Risk"] == "Medium":
+        ICMPRiskScore += x["Count"] / 100
+    elif x["Risk"] == "Low":
+        ICMPRiskScore += x["Count"] / 10000
+    ICMPVulnList[x["Risk"]] = x["Count"]
+ICMPVulnList["RiskScore"] = ICMPRiskScore
+PortVulnList.append(ICMPVulnList)
 
-
-
+dfPortVulnList = pd.DataFrame(PortVulnList)
+print(dfPortVulnList)
 # get count of unique vulnerabilities for each criticality level as well as environment risk rating for each individual Nessus ID
 RiskRatings = df["Risk"].unique()
 for x in RiskRatings:
