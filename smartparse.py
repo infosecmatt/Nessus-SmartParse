@@ -3,26 +3,31 @@ import numpy as np
 import ipaddress as ip
 
 df = pd.read_csv("../scan.csv")
-# print(df)
+
+# high level summary
+print("High level observations:")
+HighLevel = []
 
 # number of in scope IP addresses
-()
 IPRange = ip.ip_network('10.5.5.0/24')
-print("Number of IP addresses in-scope for scanning:", int(IPRange[-1]) - int(IPRange[0]))
-
+InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':int(IPRange[-1]) - int(IPRange[0])}
+HighLevel.append(InScopeAddresses)
 # number of unique hosts identified during scanning
 print()
-print("Hosts identified during scanning:", df['Host'].nunique())
+AvailableHosts = {'Observation':"Hosts identified during scanning",'Count':df['Host'].nunique()}
+HighLevel.append(AvailableHosts)
 
 # number of hosts with at least one vulnerability of Low or greater
 vulnerable = df.loc[df['Risk'] != 'None']
-print("Hosts with at least one vulnerability:", vulnerable['Host'].nunique())
-
+VulnerableHosts = {'Observation':"Hosts with at least one vulnerability",'Count':vulnerable['Host'].nunique()}
+HighLevel.append(VulnerableHosts)
 # number of services identified on the network
 
 UniqueIPPort = df.drop_duplicates(subset=['Host','Protocol','Port'], keep='last')
-print("Total number of services identified during scanning:",len(UniqueIPPort.index))
-
+TotalServices = {'Observation':"Total number of services identified during scanning",'Count':len(UniqueIPPort.index)}
+HighLevel.append(TotalServices)
+dfHighLevel = pd.DataFrame(HighLevel, columns=['Observation','Count'])
+print(dfHighLevel)
 # services identified broken down by protocol/port
 
 # tcp hosts
