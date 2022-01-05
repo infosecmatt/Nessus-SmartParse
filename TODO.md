@@ -35,6 +35,8 @@
 - for all try/excepts, be sure to include original error message by writing something to the effect of 'except Exception as e' followed by print(e)
 - create a cleanup function to run whenever part of the script fails. for example, deleting the output folder or any data run thus far
 - for IP ranges provided, documentation should specify that the ranges should be logical groupings such as office locations, departments, etc.. that way in the future the tool can break vulnerabilities down by network segment and provide insight like "40% of all vulnerabilities are located within the Austin datacenter."
+- Need to create documentation for usage
+	- Nessus CSV output should ideally be outputted with all columns (may require custom output) in order to use vulnerability age analysis
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
