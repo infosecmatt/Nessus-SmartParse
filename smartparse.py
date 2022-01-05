@@ -36,10 +36,11 @@ else:
         exit("Unable to create folder for output. Do you have write permissions to "+os.path.dirname(args.outpath)+"?")
 # checking if supplied file exists
 if os.path.isfile(args.path):
-	try:
-		df = pd.read_csv(args.path)
-	except:
-		exit("ERROR: Supplied file " + args.path + " is not a csv. Exiting...")
+    try:
+        df = pd.read_csv(args.path, engine='python',encoding='utf-8',error_bad_lines=False)
+    except Exception as e:
+        print(e)
+        exit("ERROR: Supplied file " + args.path + " is not a csv. Exiting...")
 else:
 	exit("Invalid file or path: " + args.path)
 

@@ -30,7 +30,9 @@
 - top 25 vulnerabilities by criticality
 - make the initial codebase less ugly and more efficient
 - (DONE) make sure everything gets outputted as csv
-
+- Add flag for excluded IPs or IP ranges from scope
+- for all try/excepts, be sure to include original error message by writing something to the effect of 'except Exception as e' followed by print(e)
+- create a cleanup function to run whenever part of the script fails. for example, deleting the output folder or any data run thus far
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
