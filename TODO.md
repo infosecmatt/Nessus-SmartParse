@@ -37,6 +37,7 @@
 - for IP ranges provided, documentation should specify that the ranges should be logical groupings such as office locations, departments, etc.. that way in the future the tool can break vulnerabilities down by network segment and provide insight like "40% of all vulnerabilities are located within the Austin datacenter."
 - Need to create documentation for usage
 	- Nessus CSV output should ideally be outputted with all columns (may require custom output) in order to use vulnerability age analysis
+- Use .nessus scan configuration XML files in lieu of IP ranges and potentially to gather other relevant scan information.
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
