@@ -38,6 +38,8 @@
 - Need to create documentation for usage
 	- Nessus CSV output should ideally be outputted with all columns (may require custom output) in order to use vulnerability age analysis
 - Use .nessus scan configuration XML files in lieu of IP ranges and potentially to gather other relevant scan information.
+- Determine unmanaged assets formulaically. Take the average Risk Score of all hosts, multiply by 10. Any asset with a Risk Score greater than that number may be considered unmanaged.
+	- this could yield unreliable results for organizations with no assets that are truly unmanaged, so some additional checks will have to be in place to ensure that things aren't falsely labeled as unmanaged.
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
