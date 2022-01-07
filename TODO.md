@@ -35,6 +35,11 @@
 - for all try/excepts, be sure to include original error message by writing something to the effect of 'except Exception as e' followed by print(e)
 - create a cleanup function to run whenever part of the script fails. for example, deleting the output folder or any data run thus far
 - for IP ranges provided, documentation should specify that the ranges should be logical groupings such as office locations, departments, etc.. that way in the future the tool can break vulnerabilities down by network segment and provide insight like "40% of all vulnerabilities are located within the Austin datacenter."
+- Need to create documentation for usage
+	- Nessus CSV output should ideally be outputted with all columns (may require custom output) in order to use vulnerability age analysis
+- Use .nessus scan configuration XML files in lieu of IP ranges and potentially to gather other relevant scan information.
+- Determine unmanaged assets formulaically. Take the average Risk Score of all hosts, multiply by 10. Any asset with a Risk Score greater than that number may be considered unmanaged.
+	- this could yield unreliable results for organizations with no assets that are truly unmanaged, so some additional checks will have to be in place to ensure that things aren't falsely labeled as unmanaged.
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
