@@ -56,23 +56,26 @@ if args.iprange is not None:
     except:
     	exit("Invalid IP range. Please ensure that the provided range uses slash notation.")
 # checking if supplied IP range file is valid
-elif os.path.isfile(args.rangefile):
-    with open(args.rangefile, 'r') as scope:
-        InScopeAddressCount = 0
-        for line in scope:
-            value = line.strip()
-            try:
-                ip.ip_address(value)
-                InScopeAddressCount += 1
-            except:
+elif args.rangefile is not None: 
+    if os.path.isfile(args.rangefile):
+        with open(args.rangefile, 'r') as scope:
+            InScopeAddressCount = 0
+            for line in scope:
+                value = line.strip()
                 try:
-                    subnet = ip.ip_network(value)
-                    IpsInRange = int(subnet[-1]) - int(subnet[0])
-                    InScopeAddressCount += IpsInRange
+                    ip.ip_address(value)
+                    InScopeAddressCount += 1
                 except:
-                    exit("Error encountered with IP range file. " + value + " is not a valid IP address or range.")
-        InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':InScopeAddressCount}
-        HighLevel.append(InScopeAddresses)
+                    try:
+                        subnet = ip.ip_network(value)
+                        IpsInRange = int(subnet[-1]) - int(subnet[0])
+                        InScopeAddressCount += IpsInRange
+                    except:
+                        exit("Error encountered with IP range file. " + value + " is not a valid IP address or range.")
+            InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':InScopeAddressCount}
+            HighLevel.append(InScopeAddresses)
+    else:
+        exit("Provided range file "+args.rangefile+" does not exist.")
 
 # number of unique hosts identified during scanning
 AvailableHosts = {'Observation':"Hosts identified during scanning",'Count':df['Host'].nunique()}

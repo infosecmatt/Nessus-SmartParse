@@ -40,6 +40,7 @@
 - Use .nessus scan configuration XML files in lieu of IP ranges and potentially to gather other relevant scan information.
 - Determine unmanaged assets formulaically. Take the average Risk Score of all hosts, multiply by 10. Any asset with a Risk Score greater than that number may be considered unmanaged.
 	- this could yield unreliable results for organizations with no assets that are truly unmanaged, so some additional checks will have to be in place to ensure that things aren't falsely labeled as unmanaged.
+- create an output naming format that doesn't error out every time the folder already exists (e.g., using timestamps). at the end of the script, if successful, print message to user describing where they can find the results.
 
 Long term ideas:
 - incorporate visualization / pretty output of everything
