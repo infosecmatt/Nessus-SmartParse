@@ -41,7 +41,9 @@
 - Determine unmanaged assets formulaically. Take the average Risk Score of all hosts, multiply by 10. Any asset with a Risk Score greater than that number may be considered unmanaged.
 	- this could yield unreliable results for organizations with no assets that are truly unmanaged, so some additional checks will have to be in place to ensure that things aren't falsely labeled as unmanaged.
 - create an output naming format that doesn't error out every time the folder already exists (e.g., using timestamps). at the end of the script, if successful, print message to user describing where they can find the results.
-
+- PortVulnList:
+	- create concatenation of protocol and port to get unique ID.
+		- e.g., for tcp port 0, the ID would be tcp/0; for udp port 0, the ID would be udp/0
 Long term ideas:
 - incorporate visualization / pretty output of everything
 - develop mechanism for trend monitoring
