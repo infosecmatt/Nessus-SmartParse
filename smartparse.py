@@ -47,32 +47,32 @@ else:
 #high level analysis
 HighLevel = []
 # checking if supplied IP range is valid and counting in-scope addresses if valid
-try:
-	IPRange = ip.ip_network(args.iprange)
-	#number of in scope IP addresses
-	InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':int(IPRange[-1]) - int(IPRange[0])}
-	HighLevel.append(InScopeAddresses)
-except:
-	if args.iprange is not None:
-		exit("Invalid IP range. Please ensure that the provided range uses slash notation.")
-
+if args.iprange is not None:
+    try:
+        IPRange = ip.ip_network(args.iprange)
+        #number of in scope IP addresses
+        InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':int(IPRange[-1]) - int(IPRange[0])}
+        HighLevel.append(InScopeAddresses)
+    except:
+    	exit("Invalid IP range. Please ensure that the provided range uses slash notation.")
 # checking if supplied IP range file is valid
-with open(args.rangefile, 'r') as scope:
-    InScopeAddressCount = 0
-    for line in scope:
-        value = line.strip()
-        try:
-            ip.ip_address(value)
-            InScopeAddressCount += 1
-        except:
+elif os.path.isfile(args.rangefile):
+    with open(args.rangefile, 'r') as scope:
+        InScopeAddressCount = 0
+        for line in scope:
+            value = line.strip()
             try:
-                subnet = ip.ip_network(value)
-                IpsInRange = int(subnet[-1]) - int(subnet[0])
-                InScopeAddressCount += IpsInRange
+                ip.ip_address(value)
+                InScopeAddressCount += 1
             except:
-                exit("Error encountered with IP range file. " + value + " is not a valid IP address or range.")
-    InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':InScopeAddressCount}
-    HighLevel.append(InScopeAddresses)
+                try:
+                    subnet = ip.ip_network(value)
+                    IpsInRange = int(subnet[-1]) - int(subnet[0])
+                    InScopeAddressCount += IpsInRange
+                except:
+                    exit("Error encountered with IP range file. " + value + " is not a valid IP address or range.")
+        InScopeAddresses = {'Observation':'# In-Scope IP Addresses','Count':InScopeAddressCount}
+        HighLevel.append(InScopeAddresses)
 
 # number of unique hosts identified during scanning
 AvailableHosts = {'Observation':"Hosts identified during scanning",'Count':df['Host'].nunique()}
