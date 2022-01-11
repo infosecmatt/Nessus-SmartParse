@@ -21,6 +21,7 @@
 		- 1 critical = 1 critical
 		- subject to change
 		- Actually, I do want to change it. Need to move to CVSS in the future as the severity range is too wide to just use's Nessus' Risk attribute, especially in the High Risk range
+			- to that end, I reverse-engineered the Department of Homeland Security's Risk Rating formula for their Cyber Hygiene Assessment Report (https://www.cisa.gov/uscert/sites/default/files/resources/ncats/CyHy%20Sample%20Report_508C.pdf). It's as follows: Risk Rating = CVSS ^ 7
 	- For each host, divide the RiskScore by the total RiskScore of all devices to get a percentage of risk that each host is resposible for. will open things up to analysis such as "These 5 hosts represent over 70% of risk in the organization."
 - (DONE) most severe vulnerabilities
 	- (DONE) combination of frequency found + weighted CVSS score
